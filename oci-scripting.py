@@ -62,7 +62,7 @@ print("complete")
 print(urls)
 '''
 
-
+'''
 # load the map urls into a folder on my desktop - update 10/17/2024
 def csv_to_list (csv):
     df = pd.read_csv(csv)
@@ -78,7 +78,7 @@ def downlaod_maps (oci_list):
             # generate a filename from url
             img_name = os.path.basename(url)
 
-
+'''
 
 '''
 
@@ -283,4 +283,11 @@ def extract (url, keyword):
 extract(oci_url, keyword)
 
 """
-# calvin new edit hdksbhf kjsfgdfg sjkbdfkbsf heLLO Clinv hdfkg dcDC hegtffbfgnfhn
+# loading target
+driver = webdriver.Chrome()
+
+# Open a test website to verify
+driver.get("https://www.target.com")
+
+time.sleep(5)
+driver.quit

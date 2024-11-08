@@ -137,7 +137,30 @@ master()
 
 '''
 
+# 11/8/2024 - updated version
 '''
+improved version ** 11/8/2024
+def process_url (url, keyword):
+    chrome_options = Options()
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--headless=new") # for Chrome >= 109
+    chrome_options.add_argument("--headless")
+    chrome_options.headless = True # also works
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(url)
+    time.sleep(5)
+    body_inner_html = driver.execute_script("return document.body.innerHTML;")
+    driver.quit()
+    soup = BeautifulSoup(body_inner_html, 'html5lib')
+    map_soup = soup.find("div", class_ = "image").find("a")
+    map_soup_ahref = map_soup['href']
+
+    if keyword in soup.get_text():
+        return (url, map_soup_ahref, "missing map")
+    else:
+        return (url, map_soup_ahref, "map present")
+
 def csv_to_list (csv):
     df = pd.read_csv(csv)
     oci_list = df['urls'].tolist()
@@ -149,26 +172,8 @@ def scan_list (oci_list, keyword):
 
     for url in oci_list:
         try:
-            chrome_options = Options()
-            chrome_options.add_argument("--disable-extensions")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--headless=new") # for Chrome >= 109
-            chrome_options.add_argument("--headless")
-            chrome_options.headless = True # also works
-            driver = webdriver.Chrome(options=chrome_options)
-            driver.get(url)
-            time.sleep(5)
-            body_inner_html = driver.execute_script("return document.body.innerHTML;")
-            driver.quit()
-            soup = BeautifulSoup(body_inner_html, 'html5lib')
-            map_soup = soup.find("div", class_ = "image").find("a")
-            map_soup_ahref = map_soup['href']
-
-            if keyword in soup.get_text():
-                text_list.append((url, map_soup_ahref, "missing map"))
-            else:
-                text_list.append((url, map_soup_ahref, "map present"))
-            
+            result = process_url(url, keyword)
+            text_list.append(result)
             counter += 1
             print(f"Prossed {url}")
         except WebDriverException as e:
@@ -179,7 +184,6 @@ def scan_list (oci_list, keyword):
 def master ():
     oci_list = csv_to_list('/Users/calvinpineda/Downloads/oci-urls.csv')
     keyword = 'image-unavailable-sm'
-    # file_path = '/Users/calvinpineda/Downloads/collection-map-urls.txt'
     text_list = scan_list(oci_list, keyword)
     print(text_list)
 
@@ -188,6 +192,80 @@ master()
 
 '''
 
+# 11/8/2024 - updated version with multiple csv files
+
+'''
+improved version ** 11/8/2024
+def process_url (url, keyword):
+    chrome_options = Options()
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--headless=new") # for Chrome >= 109
+    chrome_options.add_argument("--headless")
+    chrome_options.headless = True # also works
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(url)
+    time.sleep(5)
+    body_inner_html = driver.execute_script("return document.body.innerHTML;")
+    driver.quit()
+    soup = BeautifulSoup(body_inner_html, 'html5lib')
+    p_soup = soup.find("div", class_ = "col-md-8").find("p")
+    
+
+    if keyword in p_soup.get_text().lower():
+        return (url)
+    else:
+        return ("No match")
+
+def csv_to_list (csv):
+    df = pd.read_csv(csv)
+    oci_list = df['urls'].tolist()
+    return oci_list
+
+def scan_list (oci_list, keyword):
+    text_list = []
+    counter = 0 # refernce the position of the csv file
+
+    for url in oci_list:
+        try:
+            result = process_url(url, keyword)
+            text_list.append(result)
+            counter += 1
+            print(f"Prossed {url}")
+        except WebDriverException as e:
+            print(f"An error occurred: {e}")
+        time.sleep(random.uniform(10, 12))
+    return text_list
+
+def master ():
+    csv_files = [
+    '/Users/calvinpineda/Downloads/alaska.csv', 
+    '/Users/calvinpineda/Downloads/south-tahiti.csv',
+    '/Users/calvinpineda/Downloads/MED.csv',
+    '/Users/calvinpineda/Downloads/south-america.csv',
+    '/Users/calvinpineda/Downloads/caribbean.csv',
+    '/Users/calvinpineda/Downloads/asia.csv',
+    '/Users/calvinpineda/Downloads/australia.csv',
+    '/Users/calvinpineda/Downloads/british.csv',
+    '/Users/calvinpineda/Downloads/baltic.csv',
+    '/Users/calvinpineda/Downloads/new-england.csv'
+    ]
+
+    keyword = 'ultimate'
+    master_text_list = []
+    counter_csv = 0
+
+    for csv in csv_files:
+        oci_list = csv_to_list(csv)
+        text_list = scan_list(oci_list, keyword)
+        master_text_list.extend(text_list)
+        counter_csv += 1
+        print(f"Processed {csv}")
+
+
+master()
+
+'''
 
 
 '''
@@ -283,6 +361,7 @@ def extract (url, keyword):
 extract(oci_url, keyword)
 
 """
+'''
 # loading target
 driver = webdriver.Chrome()
 
@@ -291,3 +370,5 @@ driver.get("https://www.target.com")
 
 time.sleep(5)
 driver.quit
+
+'''

@@ -194,8 +194,6 @@ master()
 
 # 11/8/2024 - updated version with multiple csv files
 
-'''
-improved version ** 11/8/2024
 def process_url (url, keyword):
     chrome_options = Options()
     chrome_options.add_argument("--disable-extensions")
@@ -209,13 +207,17 @@ def process_url (url, keyword):
     body_inner_html = driver.execute_script("return document.body.innerHTML;")
     driver.quit()
     soup = BeautifulSoup(body_inner_html, 'html5lib')
-    p_soup = soup.find("div", class_ = "col-md-8").find("p")
     
-
-    if keyword in p_soup.get_text().lower():
-        return (url)
-    else:
-        return ("No match")
+    try:
+        p_soup = soup.find("div", class_ = "col-md-8").find("p")
+        if keyword in p_soup.get_text().lower():
+            return (url)
+        else:
+            return ("No match")
+    except AttributeError:
+        # Log the error and return a note indicating the issue
+        print(f"An error occurred while processing {url}: AttributeError")
+        return (url, "error")
 
 def csv_to_list (csv):
     df = pd.read_csv(csv)
@@ -231,10 +233,9 @@ def scan_list (oci_list, keyword):
             result = process_url(url, keyword)
             text_list.append(result)
             counter += 1
-            print(f"Prossed {url}")
         except WebDriverException as e:
             print(f"An error occurred: {e}")
-        time.sleep(random.uniform(10, 12))
+        time.sleep(random.uniform(4, 8))
     return text_list
 
 def master ():
@@ -251,7 +252,7 @@ def master ():
     '/Users/calvinpineda/Downloads/new-england.csv'
     ]
 
-    keyword = 'ultimate'
+    keyword = 'soon'
     master_text_list = []
     counter_csv = 0
 
@@ -261,11 +262,12 @@ def master ():
         master_text_list.extend(text_list)
         counter_csv += 1
         print(f"Processed {csv}")
+        print(master_text_list)
 
 
 master()
 
-'''
+
 
 
 '''
